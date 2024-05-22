@@ -83,6 +83,11 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(()->new ResourceNotFoundException("No booking found with booking code :" + confirmationCode));
     }
 
+    @Override
+    public List<BookedRoom> getBookingsByUserEmail(String email) {
+        return bookingRepository.findAllByGuestEmail(email);
+    }
+
     private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
         return existingBookings.stream()
                 .noneMatch(existingBooking ->

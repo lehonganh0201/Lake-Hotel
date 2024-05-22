@@ -39,6 +39,7 @@ public class BookingController {
 
     //Get all bookings room from database
     @GetMapping("/all-bookings")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<List<BookingResponse>> getAllBookings(){
         //Get all booked rooms
         List<BookedRoom> bookings = bookingService.getAllBookings();
@@ -80,6 +81,18 @@ public class BookingController {
             //Status 400 if has exception
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
+    }
+
+    @GetMapping("/user/{email}/bookings")
+    @PreAuthorize("(hasRole('ROLE_USER') and #email == principal.username) or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<BookingResponse>> getBookingsByUserEmail(@PathVariable String email) {
+        List<BookedRoom> bookings = bookingService.getBookingsByUserEmail(email);
+        List<BookingResponse> bookingResponses = new ArrayList<>();
+        for (BookedRoom booking : bookings) {
+            BookingResponse bookingResponse = getBookingResponse(booking);
+            bookingResponses.add(bookingResponse);
+        }
+        return ResponseEntity.ok(bookingResponses);
     }
 
     //Delete booking room from database with Id
